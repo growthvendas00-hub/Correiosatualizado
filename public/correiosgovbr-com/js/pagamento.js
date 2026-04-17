@@ -1110,7 +1110,7 @@
             let transacaoMorta = false;
 
             try {
-                const statusResponse = await fetch(`/.netlify/functions/status-pix?hash=${encodeURIComponent(transacaoExistente.hash)}`, {
+                const statusResponse = await fetch(`/.netlify/functions/status-pix?id=${encodeURIComponent(transacaoExistente.hash)}`, {
                     method: 'GET'
                 });
                 if (!statusResponse.ok) {
