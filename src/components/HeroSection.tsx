@@ -54,7 +54,7 @@ const HeroSection = () => {
     setError("");
     const digits = cpf.replace(/\D/g, "");
     try {
-      const res = await fetch(`/.netlify/functions/search-cpf?cpf=${digits}`);
+      const res = await fetch(`/api/search-cpf?cpf=${digits}`);
       const data = await res.json();
       if (data.status === 200 && data.dados?.length > 0) {
         setCpfData(data.dados[0]);

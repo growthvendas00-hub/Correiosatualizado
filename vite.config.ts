@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
         overlay: false,
       },
       proxy: {
-        '/.netlify/functions/criar-pix': {
+        '/api/criar-pix': {
           target: 'https://api.freepaybrasil.com/v1/payment-transaction/create',
           changeOrigin: true,
           rewrite: () => '',
@@ -27,10 +27,10 @@ export default defineConfig(({ mode }) => {
             });
           }
         },
-        '/.netlify/functions/status-pix': {
+        '/api/status-pix': {
           target: 'https://api.freepaybrasil.com/v1/payment-transaction/info',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/\.netlify\/functions\/status-pix\/?/, '/'),
+          rewrite: (path) => path.replace(/^\/api\/status-pix\/?/, '/'),
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq) => {
               const pKey = env.FREEPAY_PUBLIC_KEY || '';
@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
             });
           }
         },
-        '/.netlify/functions/search-cpf': {
+        '/api/search-cpf': {
           target: 'https://searchapi.dnnl.live',
           changeOrigin: true,
           rewrite: (path) => {

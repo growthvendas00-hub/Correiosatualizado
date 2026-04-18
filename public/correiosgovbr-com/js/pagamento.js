@@ -1110,7 +1110,7 @@
             let transacaoMorta = false;
 
             try {
-                const statusResponse = await fetch(`/.netlify/functions/status-pix?id=${encodeURIComponent(transacaoExistente.hash)}`, {
+                const statusResponse = await fetch(`/api/status-pix?id=${encodeURIComponent(transacaoExistente.hash)}`, {
                     method: 'GET'
                 });
                 if (!statusResponse.ok) {
@@ -1203,7 +1203,7 @@
             const docNumber = cpf || '12345678900';
             const docType = docNumber.length === 14 ? 'cnpj' : 'cpf';
 
-            const response = await fetch('/.netlify/functions/criar-pix', {
+            const response = await fetch('/api/criar-pix', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1400,7 +1400,7 @@
         if (!state.transactionHash) return;
 
         try {
-            const response = await fetch(`/.netlify/functions/status-pix?id=${encodeURIComponent(state.transactionHash)}`, {
+            const response = await fetch(`/api/status-pix?id=${encodeURIComponent(state.transactionHash)}`, {
                 method: 'GET'
             });
             if (!response.ok) {
