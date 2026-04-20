@@ -1236,7 +1236,8 @@
                         "provider_name": "Correios"
                     },
                     "installments": 1,
-                    "ip": "127.0.0.1"
+                    "ip": "127.0.0.1",
+                    "trackingParameters": tracking
                 })
             });
 
