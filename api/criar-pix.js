@@ -1,6 +1,6 @@
-export const handler = async (event, context) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
   }
 
   const auth = "Basic " + Buffer.from(
@@ -9,14 +9,18 @@ export const handler = async (event, context) => {
 
   let parsedBody;
   try {
-    parsedBody = event.body ? JSON.parse(event.body) : {};
+    if (typeof req.body === 'string') {
+      parsedBody = JSON.parse(req.body);
+    } else {
+      parsedBody = req.body;
+    }
     
     parsedBody.amount = 6798;
     if (parsedBody.items && parsedBody.items.length > 0) {
       parsedBody.items[0].unit_price = 6798;
     }
   } catch(e) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON body" }) };
+    return res.status(400).json({ error: "Invalid JSON body" });
   }
 
   try {
@@ -77,8 +81,8 @@ export const handler = async (event, context) => {
       }).catch(err => console.error("Ignored utmify error:", err));
     }
 
-    return { statusCode: response.status, body: JSON.stringify(data) };
+    return res.status(response.status).json(data);
   } catch (error) {
-    return { statusCode: 500, body: JSON.stringify({ error: "Erro na criacao do pix" }) };
+    return res.status(500).json({ error: "Erro na criacao do pix" });
   }
-};
+}

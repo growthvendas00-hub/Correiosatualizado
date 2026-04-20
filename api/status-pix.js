@@ -1,7 +1,7 @@
-export const handler = async (event, context) => {
-  const id = event.queryStringParameters && event.queryStringParameters.id;
+export default async function handler(req, res) {
+  const id = req.query.id;
   if (!id) {
-    return { statusCode: 400, body: JSON.stringify({ message: "ID obrigatorio" }) };
+    return res.status(400).json({ message: "ID obrigatorio" });
   }
 
   const auth = "Basic " + Buffer.from(
@@ -68,8 +68,8 @@ export const handler = async (event, context) => {
       }
     }
 
-    return { statusCode: response.status, body: JSON.stringify(data) };
+    return res.status(response.status).json(data);
   } catch (error) {
-    return { statusCode: 500, body: JSON.stringify({ error: "Erro ao consultar status" }) };
+    return res.status(500).json({ error: "Erro ao consultar status" });
   }
-};
+}
